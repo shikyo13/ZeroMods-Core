@@ -1,0 +1,11 @@
+{
+  "screen.zeromodscore.guide.timeline": "Lesson timeline",
+  "screen.zeromodscore.guide.timeline.help": "Click or drag to pause at a step. When focused, use Left / Right to move five seconds, or Home / End.",
+  "screen.zeromodscore.guide.time": "%1$ss / %2$ss",
+  "screen.zeromodscore.guide.previous": "Previous lesson",
+  "screen.zeromodscore.guide.replay": "Replay lesson",
+  "screen.zeromodscore.guide.pause": "Pause",
+  "screen.zeromodscore.guide.next": "Next lesson",
+  "screen.zeromodscore.guide.done": "Done",
+  "screen.zeromodscore.guide.play": "Play"
+}

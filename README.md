@@ -1,0 +1,68 @@
+# ZeroMods Core
+
+Shared library mod for ZeroTheAbsolute's tech mods. Mod ID: `zeromodscore`.
+
+Core owns reusable behavior. Mods supply their blocks, textures, sounds, tutorial scenes, connection policies, energy costs, and presets. It does not scan worlds, open tutorials, change narrator settings, or join unrelated mods' networks automatically.
+
+## Modules
+
+| Package | Responsibility |
+| --- | --- |
+| `network` | One `ManagedNetwork<N>` model for identity, ownership, members, nodes, historical anchor and extension properties; directory, traversal, assigned/physical connection policies, merge/split reconciliation |
+| `filter` | Category registry, predicate composition, entity selection, optional per-direction rules with shared fallback |
+| `settings` / `sync` | Typed setting definitions, labels/tooltips, validation, permission-checked immediate updates and stale-revision rejection |
+| `energy` | Simulated storage, proportional allocation and fair delivery with integer conservation |
+| `ui` | Configurable ARGB themes and matching drawing/pointer transforms |
+| `animation` | Interpolation, radial wave helpers and world-aligned hex fields with customizable impact style |
+| `tutorial` | Scene/lesson contracts, pause/replay/seek/chapter playback and explicit per-profile progress |
+| Minecraft adapter | SavedData codec, entity registry/tag matching, fitted screens, tutorial controls, model previews and translucent fullbright render state |
+
+The root artifact targets Java 17 and has no Minecraft or loader dependencies. `neoforge-1.21.1` currently provides the working Minecraft adapter and installable mod. Its jar includes the common code; **install that mod jar, not both artifacts**.
+
+## Build and integration
+
+```sh
+./gradlew build --console=plain --max-workers=2
+```
+
+Output: `neoforge-1.21.1/build/libs/zeromods-core-neoforge-1.21.1-0.1.0.jar`.
+
+Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Building a consumer builds Core automatically. Production installations require the matching Core mod on client and server. No public release or existing CurseForge installation was changed by this extraction.
+
+Core is a development API (0.1). Consumers require `[0.1.0,0.2.0)` until the API stabilizes. Forge and Fabric adapters and their consumer branches are not yet migrated; Java 17 compatibility of the shared logic does not establish loader compatibility.
+
+## Unified networks
+
+`ManagedNetwork<N>` is the model used for both a virtual energy network and a physical field. A host directory scopes node addresses to its dimension, or uses `NodeAddress` for a cross-dimensional address space. Identity and permissions do not depend on the currently loaded nodes.
+
+- Unload only changes availability. Explicit observed removal changes membership.
+- Physical splits wait until all relevant prior nodes are observed; an unloaded bridge must not be mistaken for destruction.
+- On reconnection, the chosen survivor retains its identity, name and anchor. Field Emitters prefers its earliest node in component order.
+- Merge does not grant the absorbed network's members access to the survivor. Different owners/kinds cannot merge implicitly.
+- Snapshot data does not contain transient loaded flags. Hosts must explicitly save and mark data dirty.
+- Call mutation APIs on the server thread. Validate packet sender, held tool, target existence, dimensions, permissions and payload limits in the host transport before changing state.
+
+Flux Pylons retains its legacy `quantumflux_networks` save codec while delegating identity, membership and access to Core. Field Emitters migrates observed legacy fields into `fieldemitters_core_networks` using Core's schema-1 SavedData adapter. Its former emitter NBT keys remain readable.
+
+## Directional filters
+
+`DirectionalRules<D,R>` resolves an optional override before falling back to the shared rule. The mod defines stable direction keys and its rule type. A custom rule is a copy, so later shared edits do not silently overwrite it.
+
+Field Emitters exposes this separately in **Blocking** and **Detection**:
+
+1. **Rules for: Both directions** edits the shared default.
+2. Choose a travel direction, such as **North → South**.
+3. Change **Rule source: Shared** to **Custom**, then edit that direction's filter.
+4. Switch back to **Shared** to remove its override.
+
+The shared filter retains the original direction-enable mask. Old saves have no overrides and retain their previous behavior. “North → South” describes travel, not the face on which an emitter is mounted. Per-connection overrides contain their own directional rules.
+
+## Extending Core
+
+See [docs/extension-guide.md](docs/extension-guide.md) for the contracts and examples. Prefer adding a small strategy or adapter over a global flag or a mod-name switch inside Core. New mods can compose these services without using every package.
+
+## Validation
+
+`verifyCore` runs deterministic contracts without Minecraft. Consumer GameTests exercise the actual Minecraft entity, collision, sensor and persistence adapters. Client evidence and the exact validation commands are recorded in [docs/validation.md](docs/validation.md).
+
+Source and extracted code remain copyright ZeroTheAbsolute and respective contributors. No broader redistribution license is granted by this development extraction.

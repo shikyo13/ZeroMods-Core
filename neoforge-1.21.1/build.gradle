@@ -1,0 +1,16 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev' version '2.0.141' }
+group = 'com.zeromods'
+version = rootProject.version
+base.archivesName = 'zeromods-core-neoforge-1.21.1'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+sourceSets.main.java.srcDir rootProject.file('src/main/java')
+neoForge {
+    version = '21.1.206'
+    runs { client { client() }; server { server(); programArgument '--nogui' } }
+    mods { zeromodscore { sourceSet sourceSets.main } }
+}
+def metadataVersion = version.toString()
+processResources { inputs.property 'version', metadataVersion; filesMatching('META-INF/neoforge.mods.toml') { expand version: metadataVersion } }
+tasks.withType(AbstractArchiveTask).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
+
+tasks.named('jar', Jar) { from(rootProject.file('LICENSE')) { into 'META-INF' } }
