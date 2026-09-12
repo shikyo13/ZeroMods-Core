@@ -63,6 +63,6 @@ See [docs/extension-guide.md](docs/extension-guide.md) for the contracts and exa
 
 ## Validation
 
-`verifyCore` runs deterministic contracts without Minecraft. Consumer GameTests exercise the actual Minecraft entity, collision, sensor and persistence adapters. Client evidence and the exact validation commands are recorded in [docs/validation.md](docs/validation.md).
+`verifyCore` runs deterministic contracts without Minecraft. Consumer GameTests exercise the actual Minecraft entity, collision, sensor and persistence adapters. See the consuming mod’s repository for its runtime validation and client evidence.
 
 Source and extracted code remain copyright ZeroTheAbsolute and respective contributors. No broader redistribution license is granted by this development extraction.
