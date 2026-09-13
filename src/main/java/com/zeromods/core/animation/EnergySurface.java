@@ -11,16 +11,16 @@ public final class EnergySurface {
     progress = Math.min(1, progress);
     final float p = progress;
     boolean dissolve = formation == 1 && p < 1;
-    if (dissolve || pattern == 3) {
+    if (dissolve) {
       // A fixed quarter-block grid bounds work by visible field area; coordinates match at seams.
       for (int x = (int)Math.floor(left*4); x < Math.ceil(right*4); x++)
         for (int y = (int)Math.floor(bottom*4); y < Math.ceil(top*4); y++) {
           float a = Math.max(left,x*.25f), b = Math.min(right,(x+1)*.25f);
           float c = Math.max(bottom,y*.25f), d = Math.min(top,(y+1)*.25f);
           float u=(a+b)/2, v=(c+d)/2;
-          float n=noise(u,v,time), reveal=dissolve ? smooth((p-n)*9) : pattern == 3 ? smooth((n-.22f)*5)*p : p;
+          float n=noise(u,v,time), reveal=smooth((p-n)*9);
           if (reveal <= 0) continue;
-          float edge=(dissolve || pattern == 3) ? 4*reveal*(1-reveal) : 0;
+          float edge=4*reveal*(1-reveal);
           stroke.draw(a,(c+d)/2,b,(c+d)/2,(d-c)/2,
               edge > .25 ? accent : color, (.15f+edge*.48f)*reveal);
         }
@@ -34,7 +34,8 @@ public final class EnergySurface {
       HexFieldPattern.render(left,right,bottom,top,time,impactAge,hitU,hitV,color,detail);
       return;
     }
-    if (pattern == 2 || pattern == 3) {
+    if (pattern == 3) PlasmaSurface.render(left, right, bottom, top, time, accent, detail);
+    if (pattern == 2) {
       // Each lattice cell owns one drifting mote. Adjacent tiles clip the same world-space mote.
       for (int x=(int)Math.floor(left)-1;x<=Math.ceil(right);x++)
         for(int y=(int)Math.floor(bottom)-1;y<=Math.ceil(top);y++) {

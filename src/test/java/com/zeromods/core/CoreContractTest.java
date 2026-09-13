@@ -13,6 +13,7 @@ public final class CoreContractTest {
     static void check(boolean condition, String message) { if (!condition) throw new AssertionError(message); }
     static void rejects(Runnable action) { try { action.run(); } catch (IllegalArgumentException | UnsupportedOperationException e) { return; } throw new AssertionError("Expected rejection"); }
     public static void main(String[] args) {
+        ProjectionContractTest.run();
         var graph = Map.of("a", List.of("b", "c"), "b", List.of("a", "c"), "c", List.of("a"));
         check(NetworkTraversal.connected("a", x -> x, graph::get).equals(List.of("a","b","c")), "cyclic traversal visits once in order");
         UUID owner=UUID.randomUUID(), member=UUID.randomUUID(), outsider=UUID.randomUUID();
