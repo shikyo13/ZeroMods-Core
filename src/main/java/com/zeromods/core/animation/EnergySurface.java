@@ -7,11 +7,17 @@ public final class EnergySurface {
   public static void render(float left, float right, float bottom, float top, float time,
       float impactAge, float hitU, float hitV, int color, int accent,
       int pattern, int formation, float progress, HexFieldPattern.Stroke stroke) {
+    render(left,right,bottom,top,time,impactAge,hitU,hitV,color,accent,pattern,formation,progress,true,stroke);
+  }
+
+  public static void render(float left, float right, float bottom, float top, float time,
+      float impactAge, float hitU, float hitV, int color, int accent,
+      int pattern, int formation, float progress, boolean includeFill, HexFieldPattern.Stroke stroke) {
     if (right <= left || top <= bottom || progress <= 0) return;
     progress = Math.min(1, progress);
     final float p = progress;
     boolean dissolve = formation == 1 && p < 1;
-    if (dissolve) {
+    if (includeFill && dissolve) {
       // A fixed quarter-block grid bounds work by visible field area; coordinates match at seams.
       for (int x = (int)Math.floor(left*4); x < Math.ceil(right*4); x++)
         for (int y = (int)Math.floor(bottom*4); y < Math.ceil(top*4); y++) {
@@ -24,7 +30,7 @@ public final class EnergySurface {
           stroke.draw(a,(c+d)/2,b,(c+d)/2,(d-c)/2,
               edge > .25 ? accent : color, (.15f+edge*.48f)*reveal);
         }
-    } else stroke.draw(left,(bottom+top)/2,right,(bottom+top)/2,(top-bottom)/2,color,.17f*p);
+    } else if (includeFill) stroke.draw(left,(bottom+top)/2,right,(bottom+top)/2,(top-bottom)/2,color,.17f*p);
 
     HexFieldPattern.Stroke detail = (x1,y1,x2,y2,w,c,a) -> {
       float mask = dissolve ? smooth((p-noise((x1+x2)/2,(y1+y2)/2,time))*9) : p;
