@@ -2,7 +2,8 @@ package com.zeromods.core.animation;
 
 /** Smooth scalar field and interpolated contours, rather than opaque grid tiles. */
 public final class PlasmaSurface {
-  private static final float CELL = .35f, LEVEL = .5f;
+  private static final float CELL = .25f, LEVEL = .5f;
+  private static final float HALO_WIDTH = .16f, GLOW_WIDTH = .065f, CORE_WIDTH = .014f;
 
   private PlasmaSurface() {}
 
@@ -25,12 +26,54 @@ public final class PlasmaSurface {
       float a = Math.max(left, x * CELL), b = Math.min(right, (x + 1) * CELL);
       for (int y = (int) Math.floor(bottom / CELL); y < Math.ceil(top / CELL); y++) {
         float c = Math.max(bottom, y * CELL), d = Math.min(top, (y + 1) * CELL);
-        float ac = noise(a, c, 0, ticks / 20), bc = noise(b, c, 0, ticks / 20);
-        float bd = noise(b, d, 0, ticks / 20), ad = noise(a, d, 0, ticks / 20);
+        float ac = surfaceNoise(a, c, ticks), bc = surfaceNoise(b, c, ticks);
+        float bd = surfaceNoise(b, d, ticks), ad = surfaceNoise(a, d, ticks);
         contour(a, c, ac, b, c, bc, b, d, bd, color, stroke);
         contour(a, c, ac, b, d, bd, a, d, ad, color, stroke);
       }
     }
+  }
+
+  /**
+   * Broad, interpolated light beneath the contour cores; world coordinates keep rail seams aligned.
+   */
+  public static void glow(
+      float left,
+      float right,
+      float bottom,
+      float top,
+      float ticks,
+      int color,
+      PlanarProjection.Patch patch) {
+    for (int x = (int) Math.floor(left / CELL); x < Math.ceil(right / CELL); x++) {
+      float a = Math.max(left, x * CELL), b = Math.min(right, (x + 1) * CELL);
+      for (int y = (int) Math.floor(bottom / CELL); y < Math.ceil(top / CELL); y++) {
+        float c = Math.max(bottom, y * CELL), d = Math.min(top, (y + 1) * CELL);
+        patch.draw(
+            a,
+            c,
+            b,
+            d,
+            color,
+            glowAlpha(a, c, ticks),
+            glowAlpha(b, c, ticks),
+            glowAlpha(b, d, ticks),
+            glowAlpha(a, d, ticks));
+      }
+    }
+  }
+
+  private static float surfaceNoise(float x, float y, float ticks) {
+    double seconds = ticks / 20.0;
+    double warpX = x + .7 * Math.sin(y * .83 + seconds * .11);
+    double warpY = y + .6 * Math.sin(x * .71 - seconds * .09);
+    double depth = 1.3 * Math.sin(x * .57 + y * .63 + seconds * .07);
+    return noise(warpX, warpY, depth, seconds);
+  }
+
+  public static float glowAlpha(float x, float y, float ticks) {
+    float distance = Math.abs(surfaceNoise(x, y, ticks) - LEVEL);
+    return .025f + .16f * (float) Math.exp(-distance * 18);
   }
 
   private static void contour(
@@ -58,7 +101,8 @@ public final class PlasmaSurface {
     float ab = (LEVEL - an) / (bn - an), ac = (LEVEL - an) / (cn - an);
     float x1 = ax + (bx - ax) * ab, y1 = ay + (by - ay) * ab;
     float x2 = ax + (cx - ax) * ac, y2 = ay + (cy - ay) * ac;
-    stroke.draw(x1, y1, x2, y2, .055f, color, .055f);
-    stroke.draw(x1, y1, x2, y2, .012f, color, .34f);
+    stroke.draw(x1, y1, x2, y2, HALO_WIDTH, color, .035f);
+    stroke.draw(x1, y1, x2, y2, GLOW_WIDTH, color, .12f);
+    stroke.draw(x1, y1, x2, y2, CORE_WIDTH, color, .58f);
   }
 }

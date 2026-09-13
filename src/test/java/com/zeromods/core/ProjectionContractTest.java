@@ -46,6 +46,26 @@ final class ProjectionContractTest {
         SphereFormation.PROJECTED_SEED.coverage(0, .9, .5f, .5f) > .99
             && SphereFormation.PROJECTED_SEED.coverage(0, .1, .5f, .5f) < .01,
         "seed spreads from crown");
+    int[] patches = {0};
+    PlasmaSurface.glow(
+        -2,
+        2,
+        -2,
+        2,
+        30,
+        0xffffff,
+        (left, bottom, right, top, color, a, b, c, d) -> {
+          for (float alpha : new float[] {a, b, c, d})
+            CoreContractTest.check(
+                Float.isFinite(alpha) && alpha >= 0 && alpha <= .1851f,
+                "plasma glow remains translucent");
+          CoreContractTest.check(
+              a == PlasmaSurface.glowAlpha(left, bottom, 30)
+                  && c == PlasmaSurface.glowAlpha(right, top, 30),
+              "shared vertices have identical light");
+          patches[0]++;
+        });
+    CoreContractTest.check(patches[0] == 256, "plasma mesh work is bounded by surface area");
     int[] strokes = {0};
     PlasmaSurface.render(
         -2,

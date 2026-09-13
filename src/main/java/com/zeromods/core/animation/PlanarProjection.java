@@ -5,7 +5,7 @@ public final class PlanarProjection {
   public static final int FIRST_PRESET = 3;
   public static final int PRESET_COUNT = FIRST_PRESET + SphereFormation.values().length;
   public static final int DURATION_TICKS = 80;
-  private static final float CELL_SIZE = .5f, FRONT_WIDTH = .045f;
+  private static final float CELL_SIZE = .5f, DISSOLVE_CELL_SIZE = .25f, FRONT_WIDTH = .045f;
   private static final int FAN_RAYS = 12, RIBS = 8;
 
   public record Frame(
@@ -136,10 +136,11 @@ public final class PlanarProjection {
           .17f * opacity);
       return;
     }
-    for (int x = (int) Math.floor(left / CELL_SIZE); x < Math.ceil(right / CELL_SIZE); x++)
-      for (int y = (int) Math.floor(bottom / CELL_SIZE); y < Math.ceil(top / CELL_SIZE); y++) {
-        float a = Math.max(left, x * CELL_SIZE), b = Math.min(right, (x + 1) * CELL_SIZE);
-        float c = Math.max(bottom, y * CELL_SIZE), d = Math.min(top, (y + 1) * CELL_SIZE);
+    float cell = style == SphereFormation.PLASMA_DISSOLVE ? DISSOLVE_CELL_SIZE : CELL_SIZE;
+    for (int x = (int) Math.floor(left / cell); x < Math.ceil(right / cell); x++)
+      for (int y = (int) Math.floor(bottom / cell); y < Math.ceil(top / cell); y++) {
+        float a = Math.max(left, x * cell), b = Math.min(right, (x + 1) * cell);
+        float c = Math.max(bottom, y * cell), d = Math.min(top, (y + 1) * cell);
         patch.draw(
             a,
             c,
