@@ -27,7 +27,7 @@ The root artifact targets Java 17 and has no Minecraft or loader dependencies. `
 
 Output: `neoforge-1.21.1/build/libs/zeromods-core-neoforge-1.21.1-0.1.0.jar`.
 
-Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Building a consumer builds Core automatically. Production installations require the matching Core mod on client and server. No public release or existing CurseForge installation was changed by this extraction.
+Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Building a consumer builds Core automatically. Production installations require the matching Core mod on client and server. Core is currently available as source; installable mod-platform releases are not yet published.
 
 Core is a development API (0.1). Consumers require `[0.1.0,0.2.0)` until the API stabilizes. Forge and Fabric adapters and their consumer branches are not yet migrated; Java 17 compatibility of the shared logic does not establish loader compatibility.
 
@@ -61,8 +61,8 @@ The shared filter retains the original direction-enable mask. Old saves have no 
 
 See [docs/extension-guide.md](docs/extension-guide.md) for the contracts and examples. Prefer adding a small strategy or adapter over a global flag or a mod-name switch inside Core. New mods can compose these services without using every package.
 
-## Validation
-
-`verifyCore` runs deterministic contracts without Minecraft. Consumer GameTests exercise the actual Minecraft entity, collision, sensor and persistence adapters. See the consuming mod’s repository for its runtime validation and client evidence.
-
 Source and extracted code remain copyright ZeroTheAbsolute and respective contributors. No broader redistribution license is granted by this development extraction.
+
+## Repository scope
+
+This repository contains library source, runtime assets, build files, and documentation. Keep test harnesses, demo projects, recordings, and publishing tooling in an external workspace.
