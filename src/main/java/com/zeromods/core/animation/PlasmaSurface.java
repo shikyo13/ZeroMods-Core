@@ -8,10 +8,11 @@ public final class PlasmaSurface {
   private PlasmaSurface() {}
 
   public static float noise(double x, double y, double z, double seconds) {
-    return (float)
-        (.5
-            + .23 * Math.sin(x * 2.1 + Math.sin(z * 1.8) + seconds * .16)
-            + .19 * Math.sin(y * 2.7 + z * .9 + Math.sin(x * 1.3) - seconds * .12));
+    x = x * .85 + seconds * .13;
+    y = y * .85 - seconds * .08;
+    z = z * .85 + seconds * .1;
+    return (float) ((Math.sin(x * 2.1 + Math.sin(z * 1.8))
+        + Math.sin(y * 2.7 + z * .9 + Math.sin(x * 1.3))) * .25 + .5);
   }
 
   public static void render(
@@ -64,11 +65,7 @@ public final class PlasmaSurface {
   }
 
   private static float surfaceNoise(float x, float y, float ticks) {
-    double seconds = ticks / 20.0;
-    double warpX = x + .7 * Math.sin(y * .83 + seconds * .11);
-    double warpY = y + .6 * Math.sin(x * .71 - seconds * .09);
-    double depth = 1.3 * Math.sin(x * .57 + y * .63 + seconds * .07);
-    return noise(warpX, warpY, depth, seconds);
+    return noise(x, y, 0, ticks / 20.0);
   }
 
   public static float glowAlpha(float x, float y, float ticks) {

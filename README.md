@@ -17,7 +17,7 @@ Core owns reusable behavior. Mods supply their blocks, textures, sounds, tutoria
 | `tutorial` | Scene/lesson contracts, pause/replay/seek/chapter playback and explicit per-profile progress |
 | Minecraft adapter | SavedData codec, entity registry/tag matching, fitted screens, tutorial controls, model previews and translucent fullbright render state |
 
-The root artifact targets Java 17 and has no Minecraft or loader dependencies. `neoforge-1.21.1` currently provides the working Minecraft adapter and installable mod. Its jar includes the common code; **install that mod jar, not both artifacts**.
+The root artifact targets Java 17 and has no Minecraft or loader dependencies. The `neoforge-1.21.1`, `forge-1.21.1`, `forge-1.20.1`, `fabric-1.21.1` and `fabric-1.20.1` modules provide Minecraft adapters and installable mods. Each adapter jar includes the common code; **consumers bundle the adapter matching their loader and Minecraft version**.
 
 ## Build and integration
 
@@ -25,11 +25,11 @@ The root artifact targets Java 17 and has no Minecraft or loader dependencies. `
 ./gradlew build --console=plain --max-workers=2
 ```
 
-Output: `neoforge-1.21.1/build/libs/zeromods-core-neoforge-1.21.1-0.1.0.jar`.
+Output: each adapter’s `build/libs/` directory. Minecraft 1.21.1 requires Java 21; Minecraft 1.20.1 requires Java 17.
 
-Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Building a consumer builds Core automatically. Production installations require the matching Core mod on client and server. Core is currently available as source; installable mod-platform releases are not yet published.
+Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Forge and NeoForge consumer builds build Core automatically. Before building a Fabric consumer, build the matching Core adapter so Loom can remap its dependency: `./gradlew :fabric-1.21.1:build` or `./gradlew :fabric-1.20.1:build`. Field Emitters and the main Flux Pylons build bundle Core using the loader’s nested-jar support. Players do not need a separate Core download. The loader resolves one compatible Core version when several consumers are installed together. The older Quantum-Flux development checkout still uses a separate Core artifact.
 
-Core is a development API (0.1). Consumers require `[0.1.0,0.2.0)` until the API stabilizes. Forge and Fabric adapters and their consumer branches are not yet migrated; Java 17 compatibility of the shared logic does not establish loader compatibility.
+Core is a development API (0.1). Consumers require `[0.1.0,0.2.0)` until the API stabilizes. Field Emitters uses all five platform adapters. Other consumers must migrate their loader-specific code separately.
 
 ## Unified networks
 

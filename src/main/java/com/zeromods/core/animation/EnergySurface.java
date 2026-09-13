@@ -13,6 +13,20 @@ public final class EnergySurface {
   public static void render(float left, float right, float bottom, float top, float time,
       float impactAge, float hitU, float hitV, int color, int accent,
       int pattern, int formation, float progress, boolean includeFill, HexFieldPattern.Stroke stroke) {
+    render(left, right, bottom, top, time, ImpactWaves.single(impactAge, hitU, hitV), color,
+        accent, pattern, formation, progress, includeFill, stroke);
+  }
+
+  public static void render(float left, float right, float bottom, float top, float time,
+      ImpactWaves waves, int color, int accent, int pattern, int formation, float progress,
+      boolean includeFill, HexFieldPattern.Stroke stroke) {
+    render(left, right, bottom, top, time, (HexFieldPattern.Ripples) waves, color, accent,
+        pattern, formation, progress, includeFill, stroke);
+  }
+
+  public static void render(float left, float right, float bottom, float top, float time,
+      HexFieldPattern.Ripples waves, int color, int accent, int pattern, int formation,
+      float progress, boolean includeFill, HexFieldPattern.Stroke stroke) {
     if (right <= left || top <= bottom || progress <= 0) return;
     progress = Math.min(1, progress);
     final float p = progress;
@@ -37,33 +51,54 @@ public final class EnergySurface {
       if (mask > .01f) stroke.draw(x1,y1,x2,y2,w,c,a*mask);
     };
     if (pattern == 0) {
-      HexFieldPattern.render(left,right,bottom,top,time,impactAge,hitU,hitV,color,detail);
+      HexFieldPattern.render(left,right,bottom,top,time,waves,color,accent,HexFieldPattern.Style.forAccent(accent),detail);
       return;
     }
-    if (pattern == 3) PlasmaSurface.render(left, right, bottom, top, time, accent, detail);
+    if (pattern == 3) {
+      var plasmaImpact = new HexFieldPattern.Style(40, .35f, 1, accent, 1);
+      PlasmaSurface.render(left, right, bottom, top, time, accent, (x1,y1,x2,y2,w,c,a) -> {
+        float pulse = waves.sample((x1+x2)*.5f, (y1+y2)*.5f, plasmaImpact);
+        detail.draw(x1,y1,x2,y2,w,EnergyColors.highlight(c,pulse*.18f),Math.min(1,a*(1+pulse*3)));
+      });
+      return;
+    }
     if (pattern == 2) {
-      // Each lattice cell owns one drifting mote. Adjacent tiles clip the same world-space mote.
-      for (int x=(int)Math.floor(left)-1;x<=Math.ceil(right);x++)
-        for(int y=(int)Math.floor(bottom)-1;y<=Math.ceil(top);y++) {
-          float seed=(float)(Math.sin(x*127.1+y*311.7)*43758.5453);
-          seed-=Math.floor(seed);
-          float u=x+.5f+(float)Math.sin(time*.018+seed*19)*.3f;
-          float v=y+(seed+time*.007f-(float)Math.floor(seed+time*.007f));
-          float flicker=.4f+.25f*(float)Math.sin(time*.06+seed*31);
-          detail.draw(u-.035f,v,u+.035f,v,.035f,accent,flicker);
-          detail.draw(u-.075f,v,u+.075f,v,.075f,accent,flicker*.14f);
+      pixels(left, right, bottom, top, time, waves, accent, detail);
+      return;
+    }
+    waves.rings(left, right, bottom, top, accent, HexFieldPattern.Style.FIELD, detail);
+  }
+
+  private static void pixels(float left, float right, float bottom, float top, float time,
+      HexFieldPattern.Ripples waves, int accent, HexFieldPattern.Stroke stroke) {
+    for (int x=(int)Math.floor(left)-1; x<=Math.ceil(right); x++)
+      for (int y=(int)Math.floor(bottom)-1; y<=Math.ceil(top); y++) {
+        float seed=(float)(Math.sin(x*127.1+y*311.7)*43758.5453);
+        seed-=Math.floor(seed);
+        float u=x+.5f+(float)Math.sin(time*.018+seed*19)*.3f;
+        float v=y+(seed+time*.007f-(float)Math.floor(seed+time*.007f));
+        float pulse=waves.sample(u,v,HexFieldPattern.Style.FIELD);
+        float flicker=.4f+.25f*(float)Math.sin(time*.06+seed*31);
+        float spark=(float)Math.sqrt(pulse);
+        float size=.035f+spark*.065f;
+        square(stroke,u,v,size,EnergyColors.highlight(accent,spark*.55f),Math.min(1,flicker+spark*.8f));
+        square(stroke,u,v,Math.min(.18f,size*2),accent,flicker*.14f+spark*.22f);
+        if (pulse < .06f) continue;
+        // A repeatable burst belongs to each cell, keeping adjoining field tiles in sync.
+        for(int fragment=0;fragment<5;fragment++) {
+          double angle=seed*Math.PI*2+fragment*Math.PI*2/5;
+          float travel=(1-pulse)*.55f+.05f;
+          float a=u+(float)Math.cos(angle)*travel;
+          float b=v+(float)Math.sin(angle)*travel+travel*.25f;
+          square(stroke,a,b,.025f+spark*.045f,EnergyColors.highlight(accent,spark*.4f),spark*.95f);
+          square(stroke,a,b,.09f,accent,spark*.14f);
         }
-    }
-    if(impactAge>=0 && impactAge<32) {
-      float radius=impactAge*.115f, fade=1-impactAge/32;
-      for(int i=0;i<64;i++) {
-        double a=i*Math.PI/32, b=(i+1)*Math.PI/32;
-        float x1=hitU+(float)Math.cos(a)*radius,y1=hitV+(float)Math.sin(a)*radius;
-        float x2=hitU+(float)Math.cos(b)*radius,y2=hitV+(float)Math.sin(b)*radius;
-        detail.draw(x1,y1,x2,y2,.09f,accent,fade*.13f);
-        detail.draw(x1,y1,x2,y2,.015f,accent,fade*.7f);
       }
-    }
+  }
+
+  private static void square(HexFieldPattern.Stroke stroke, float x, float y, float size,
+      int color, float alpha) {
+    stroke.draw(x-size,y,x+size,y,size,color,alpha);
   }
 
   private static float noise(float u,float v,float time) {

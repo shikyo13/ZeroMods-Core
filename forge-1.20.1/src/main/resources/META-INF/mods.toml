@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All rights reserved"
+[[mods]]
+modId="zeromodscore"
+version="${version}"
+displayName="ZeroMods Core"
+authors="ZeroTheAbsolute"
+description="Shared networks, filters, settings, UI, animation and tutorial services for ZeroMods."
+[[dependencies.zeromodscore]]
+modId="forge"
+mandatory=true
+versionRange="[47.4.10,48)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.zeromodscore]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.20.2)"
+ordering="NONE"
+side="BOTH"

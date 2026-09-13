@@ -14,3 +14,5 @@ processResources { inputs.property 'version', metadataVersion; filesMatching('ME
 tasks.withType(AbstractArchiveTask).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
 
 tasks.named('jar', Jar) { from(rootProject.file('LICENSE')) { into 'META-INF' } }
+
+sourceSets.main.resources.srcDir rootProject.file('src/main/resources')

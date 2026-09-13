@@ -1,0 +1,15 @@
+plugins { id 'java-library'; id 'net.neoforged.moddev.legacyforge' version '2.0.141' }
+group = 'com.zeromods'
+version = rootProject.version
+base.archivesName = 'zeromods-core-forge-1.20.1'
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+sourceSets.main.java.srcDir rootProject.file('src/main/java')
+legacyForge {
+ enable { forgeVersion = '1.20.1-47.4.10'; disableRecompilation = false }
+ mods { zeromodscore { sourceSet(sourceSets.main) } }
+}
+processResources { inputs.property 'version', project.version; filesMatching('META-INF/mods.toml') { expand version: project.version } }
+tasks.withType(AbstractArchiveTask).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
+tasks.named('jar', Jar) { from(rootProject.file('LICENSE')) { into 'META-INF' } }
+
+sourceSets.main.resources.srcDir rootProject.file('src/main/resources')

@@ -4,9 +4,9 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.resources.ResourceLocation;
 
-public final class EnergyRenderTypes extends RenderStateShard {
+public final class EnergyRenderTypes extends RenderType {
   private EnergyRenderTypes() {
-    super("zeromodscore_energy", () -> {}, () -> {});
+    super("zeromodscore_energy", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 4096, false, true, () -> {}, () -> {});
   }
 
   private static ShaderInstance surfaceShader;
@@ -21,14 +21,14 @@ public final class EnergyRenderTypes extends RenderStateShard {
 
   public static RenderType translucent(String name, ResourceLocation texture) {
     return
-      RenderType.create(
+      create(
           name,
           DefaultVertexFormat.NEW_ENTITY,
           VertexFormat.Mode.QUADS,
           4096,
           false,
           true,
-          RenderType.CompositeState.builder()
+          CompositeState.builder()
               .setShaderState(RENDERTYPE_EYES_SHADER)
               .setTextureState(
                   new TextureStateShard(

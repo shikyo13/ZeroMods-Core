@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "zeromodscore",
+  "version": "${version}",
+  "name": "ZeroMods Core",
+  "description": "Shared networks, filters, UI, animation and tutorial services for ZeroMods.",
+  "authors": [
+    "ZeroTheAbsolute"
+  ],
+  "license": "All rights reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.zeromods.core.fabric.ZeroModsCore"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
