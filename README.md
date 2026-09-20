@@ -27,9 +27,9 @@ The root artifact targets Java 17 and has no Minecraft or loader dependencies. T
 
 Output: each adapter’s `build/libs/` directory. Minecraft 1.21.1 requires Java 21; Minecraft 1.20.1 requires Java 17.
 
-Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Forge and NeoForge consumer builds build Core automatically. Before building a Fabric consumer, build the matching Core adapter so Loom can remap its dependency: `./gradlew :fabric-1.21.1:build` or `./gradlew :fabric-1.20.1:build`. Field Emitters and the main Flux Pylons build bundle Core using the loader’s nested-jar support. Players do not need a separate Core download. The loader resolves one compatible Core version when several consumers are installed together. The older Quantum-Flux development checkout still uses a separate Core artifact.
+Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Forge and NeoForge consumer builds build Core automatically. Before building a Fabric consumer, build the matching Core adapter so Loom can remap its dependency: `./gradlew :fabric-1.21.1:build` or `./gradlew :fabric-1.20.1:build`. Field Emitters and Flux Pylons bundle Core on all five supported targets using the loader’s nested-jar support. Players do not need a separate Core download. The loader resolves one compatible Core version when several consumers are installed together. The older Quantum-Flux development checkout still uses a separate Core artifact.
 
-Core is a development API (0.1), currently 0.1.1. Consumers must require at least the version whose APIs they use, with an upper bound of 0.2.0 until the API stabilizes. Field Emitters requires `[0.1.1,0.2.0)`; older compatible consumers may still accept 0.1.0. Published Core versions are immutable: changed library code must receive a new version. Test consumers together so nested dependency selection uses one compatible library. Field Emitters uses all five platform adapters. Other consumers must migrate their loader-specific code separately.
+Core is a development API (0.1), currently 0.1.2. Consumers must require at least the version whose APIs they use, with an upper bound of 0.2.0 until the API stabilizes. New Field Emitters and Flux Pylons releases require `[0.1.2,0.2.0)`; older compatible releases may have lower minimums. Published Core versions are immutable: changed library code must receive a new version. Test consumers together so nested dependency selection uses one compatible library. Field Emitters uses all five platform adapters. Other consumers must migrate their loader-specific code separately.
 
 ## Unified networks
 
@@ -66,3 +66,17 @@ Source and extracted code remain copyright ZeroTheAbsolute and respective contri
 ## Repository scope
 
 This repository contains library source, runtime assets, build files, and documentation. Keep test harnesses, demo projects, recordings, and publishing tooling in an external workspace.
+
+## Shared bundle release policy
+
+Maintain one Core release line, not separate consumer variants. A Core release has one artifact per supported Minecraft/loader target. Field Emitters and Flux Pylons in the same release batch must bundle byte-identical Core artifacts for each matching target.
+
+Before publishing a release batch:
+
+1. Build the matching Core adapters from one source revision and record their versions and SHA-256 hashes.
+2. Build consumers against those adapters using the same minimum compatible version and upper compatibility bound.
+3. Extract every nested Core jar and compare its hash with the corresponding canonical adapter and the other consumer's bundle. Fail the release check on any mismatch.
+4. Verify the nested dependency metadata and test both consumers together. Confirm the loader selects one compatible Core instance, energy transfer works, and network state survives a world reload.
+5. Preserve the artifact/hash manifest with the release evidence outside source repositories.
+
+Do not overwrite published artifacts. A Core change receives a new version. Older consumer releases may retain older compatible bundles; that alone does not require republishing them. The loader resolves a compatible version. Do not shade or relocate Core classes into consumer jars.

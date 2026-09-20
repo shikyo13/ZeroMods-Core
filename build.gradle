@@ -1,6 +1,6 @@
 plugins { id 'java-library' }
 group = 'com.zeromods'
-version = '0.1.1'
+version = '0.1.2'
 java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
 tasks.withType(JavaCompile).configureEach { options.release = 17; options.encoding = 'UTF-8' }
 tasks.withType(AbstractArchiveTask).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
