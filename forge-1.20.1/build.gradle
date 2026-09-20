@@ -4,6 +4,7 @@ version = rootProject.version
 base.archivesName = 'zeromods-core-forge-1.20.1'
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 sourceSets.main.java.srcDir rootProject.file('src/main/java')
+sourceSets.main.java.srcDir rootProject.file('minecraft-common/src/main/java')
 legacyForge {
  enable { forgeVersion = '1.20.1-47.4.10'; disableRecompilation = false }
  mods { zeromodscore { sourceSet(sourceSets.main) } }

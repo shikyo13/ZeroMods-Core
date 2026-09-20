@@ -4,6 +4,7 @@ version = rootProject.version
 base.archivesName = 'zeromods-core-fabric-1.20.1'
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 sourceSets.main.java.srcDir rootProject.file('src/main/java')
+sourceSets.main.java.srcDir rootProject.file('minecraft-common/src/main/java')
 dependencies {
  minecraft 'com.mojang:minecraft:1.20.1'
  mappings loom.officialMojangMappings()

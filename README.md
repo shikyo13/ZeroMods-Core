@@ -10,7 +10,7 @@ Core owns reusable behavior. Mods supply their blocks, textures, sounds, tutoria
 | --- | --- |
 | `network` | One `ManagedNetwork<N>` model for identity, ownership, members, nodes, historical anchor and extension properties; directory, traversal, assigned/physical connection policies, merge/split reconciliation |
 | `filter` | Category registry, predicate composition, entity selection, optional per-direction rules with shared fallback |
-| `settings` / `sync` | Typed setting definitions, labels/tooltips, validation, permission-checked immediate updates and stale-revision rejection |
+| `settings` / `sync` | Typed setting definitions, labels/tooltips, validation, permission-checked immediate updates, strict revisions and atomic per-property edits |
 | `energy` | Simulated storage, proportional allocation and fair delivery with integer conservation |
 | `ui` | Configurable ARGB themes and matching drawing/pointer transforms |
 | `animation` | Interpolation, radial wave helpers and world-aligned hex fields with customizable impact style |
@@ -29,7 +29,7 @@ Output: each adapter’s `build/libs/` directory. Minecraft 1.21.1 requires Java
 
 Field Emitters, Flux Pylons and the older Quantum-Flux development checkout use Gradle composite builds of this sibling directory. Forge and NeoForge consumer builds build Core automatically. Before building a Fabric consumer, build the matching Core adapter so Loom can remap its dependency: `./gradlew :fabric-1.21.1:build` or `./gradlew :fabric-1.20.1:build`. Field Emitters and the main Flux Pylons build bundle Core using the loader’s nested-jar support. Players do not need a separate Core download. The loader resolves one compatible Core version when several consumers are installed together. The older Quantum-Flux development checkout still uses a separate Core artifact.
 
-Core is a development API (0.1). Consumers require `[0.1.0,0.2.0)` until the API stabilizes. Field Emitters uses all five platform adapters. Other consumers must migrate their loader-specific code separately.
+Core is a development API (0.1), currently 0.1.1. Consumers must require at least the version whose APIs they use, with an upper bound of 0.2.0 until the API stabilizes. Field Emitters requires `[0.1.1,0.2.0)`; older compatible consumers may still accept 0.1.0. Published Core versions are immutable: changed library code must receive a new version. Test consumers together so nested dependency selection uses one compatible library. Field Emitters uses all five platform adapters. Other consumers must migrate their loader-specific code separately.
 
 ## Unified networks
 

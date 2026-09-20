@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 /** Keeps the complete control canvas visible, with input mapped to the same canvas. */
 public abstract class FittedScreen extends Screen {
   private double fitScale = 1;
+  private final TextOverflow overflow = new TextOverflow();
 
   protected FittedScreen(Component title) {
     super(title);
@@ -31,6 +32,7 @@ public abstract class FittedScreen extends Screen {
   }
 
   protected void beginFit(GuiGraphics graphics) {
+    overflow.clear();
     graphics.pose().pushPose();
     graphics.pose().scale((float) fitScale, (float) fitScale, 1);
   }
@@ -64,5 +66,19 @@ public abstract class FittedScreen extends Screen {
   @Override
   public void mouseMoved(double x, double y) {
     super.mouseMoved(x / fitScale, y / fitScale);
+  }
+  protected void drawLabel(GuiGraphics graphics, String text, int x, int y, int width, int color) {
+    overflow.drawLabel(font, graphics, text, x, y, width, color);
+  }
+
+  protected void drawParagraph(GuiGraphics graphics, Component text, int x, int y,
+      int width, int height, int color) {
+    overflow.drawParagraph(font, graphics, text, x, y, width, height, color);
+  }
+
+  @Override
+  public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    super.render(graphics, mouseX, mouseY, partialTick);
+    overflow.render(font, graphics, width, mouseX, mouseY);
   }
 }

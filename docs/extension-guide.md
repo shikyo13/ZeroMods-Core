@@ -10,15 +10,37 @@ Snapshot/restore round trips must preserve IDs, names, members and historical an
 
 `ManagedNetwork.property` supports namespaced, bounded strings for mod-specific persisted metadata. Keep secrets out of client-visible snapshots. The host is responsible for permission checks and synchronization; do not send a full server snapshot merely because a GUI is open.
 
+## Persistent node identities
+
+Use `NodeIdentities.reconcile` before physical topology reconciliation when node addresses can
+be reused or moved. Supply `Node` adapters for loaded hosts and a `Store` for the host's existing
+identity codec. Identity assignment must mark the host dirty. `replacement()` is the host's
+explicit policy for newly placed nodes at legacy addresses with no recorded identity.
+
+Core handles address reuse, same-owner relocation and copied identities. It preserves unloaded
+members and never assigns duplicate loaded identities to the same original node. Hosts retain
+save keys, migration rules, settings inheritance and world access. A store must return valid
+identity maps; Core takes a mutable copy and sends the updated map back through `write`.
+
 ## Settings and GUI
 
 Register a `Setting<T>` with a namespaced ID, immutable value type, valid default, validator, translation label and tooltip. Build controls from the same definitions used to validate updates. `SettingsSession` rejects unauthorized, stale, unknown and invalid writes. It returns `UNCHANGED` for no-op updates, preventing unnecessary save/sync traffic.
 
 A settings value must be immutable (for example, a scalar or immutable record). The snapshot copies the map, not arbitrary value objects. Supply a host-specific disk/wire codec for custom values; never deserialize arbitrary classes from a packet.
 
+For independent concurrent edits, use `SettingsEdits` with a finite property schema and
+before/after values. Core applies changes to a copied snapshot, merges unrelated properties,
+rejects unknown or duplicate keys, and rolls back an atomic batch on conflict. Properties own
+value validation and copying. The host owns payload decoding/limits, scope and permission checks,
+side effects, acknowledgements and persistence. FE's NBT schema is deliberately not part of Core.
+
+`SettingsSession` remains the strict whole-revision API for simple editors; using it deliberately
+rejects stale revisions rather than rebasing independent properties. These are distinct policies,
+not interchangeable wire protocols.
+
 The server is authoritative. Send the expected revision with an edit, apply it on the server thread, and return the new snapshot or a clear rejection. Preserve text focus while receiving acknowledgements. Flush valid debounced text edits when leaving the screen.
 
-Use `CanvasFit`/`FittedScreen` for one coordinate transform across rendering, hover, clicks, releases and drags. Create a `UiTheme` per visual style; do not mutate a global palette. Current consumer screen layouts are retained during extraction; new screens should compose Core components and keep domain-specific navigation in the mod.
+Use `CanvasFit`/`FittedScreen` for one coordinate transform across rendering, hover, clicks, releases and drags. Use its `drawLabel` and `drawParagraph` helpers for bounded text with full-text hover disclosure; pass mouse coordinates in the fitted canvas when rendering. Create a `UiTheme` per visual style; do not mutate a global palette. Current consumer screen layouts are retained during extraction; new screens should compose Core components and keep domain-specific navigation in the mod.
 
 ## Filters
 

@@ -4,6 +4,7 @@ version = rootProject.version
 base.archivesName = 'zeromods-core-neoforge-1.21.1'
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 sourceSets.main.java.srcDir rootProject.file('src/main/java')
+sourceSets.main.java.srcDir rootProject.file('minecraft-common/src/main/java')
 neoForge {
     version = '21.1.206'
     runs { client { client() }; server { server(); programArgument '--nogui' } }
