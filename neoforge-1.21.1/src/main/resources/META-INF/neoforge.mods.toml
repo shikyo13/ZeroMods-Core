@@ -19,3 +19,11 @@ type="required"
 versionRange="[1.21.1,1.21.2)"
 ordering="NONE"
 side="BOTH"
+
+# Core's EMI plugin forwards input to EMI's screen overlay, which requires this version.
+[[dependencies.zeromodscore]]
+modId="emi"
+type="optional"
+versionRange="[1.1.24,)"
+ordering="AFTER"
+side="CLIENT"
