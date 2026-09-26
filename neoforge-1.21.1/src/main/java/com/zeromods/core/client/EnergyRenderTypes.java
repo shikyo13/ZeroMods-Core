@@ -29,7 +29,8 @@ public final class EnergyRenderTypes extends RenderStateShard {
           false,
           true,
           RenderType.CompositeState.builder()
-              .setShaderState(RENDERTYPE_EYES_SHADER)
+              .setShaderState(new ShaderStateShard(() ->
+                  ShaderPackCompat.emissiveShader(GameRenderer.getRendertypeEyesShader())))
               .setTextureState(
                   new TextureStateShard(
                       texture,
