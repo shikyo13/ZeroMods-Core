@@ -16,4 +16,13 @@ repositories { exclusiveContent {
  filter { includeGroup 'org.lwjgl' }
 } }
 
+// Recipe browsers are compile-only: Core serves them when installed and never bundles them.
+repositories {
+ maven { url = 'https://maven.blamejared.com/'; content { includeGroup 'mezz.jei' } }
+ maven { url = 'https://maven.terraformersmc.com/releases/'; content { includeGroup 'dev.emi' } }
+}
+dependencies {
+ compileOnly 'mezz.jei:jei-1.21.1-common-api:19.21.0.247'
+}
+
 sourceSets.main.resources.srcDir rootProject.file('src/main/resources')

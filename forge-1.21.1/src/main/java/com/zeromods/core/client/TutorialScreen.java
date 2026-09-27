@@ -53,7 +53,10 @@ public final class TutorialScreen extends FittedScreen {
         int chapterWidth = (panelWidth - 24 - 2 * (Math.min(5, lesson.scenes().size()) - 1)) / Math.min(5, lesson.scenes().size());
         for (int index = chapterPage * 5; index < Math.min(lesson.scenes().size(), (chapterPage + 1) * 5); index++) {
             int chapter = index;
-            Button button = Button.builder(lesson.scenes().get(index).title(), ignored -> playback.setScene(chapter))
+            Button button = Button.builder(lesson.scenes().get(index).title(), ignored -> {
+                        playback.setScene(chapter);
+                        setFocused(null);
+                    })
                     .bounds(left + 12 + (index % 5) * (chapterWidth + 2), chapterTop, chapterWidth, 20).build();
             chapters.add(addRenderableWidget(button));
         }
@@ -96,7 +99,12 @@ public final class TutorialScreen extends FittedScreen {
             y += font.lineHeight;
         }
         int chapter = playback.sceneIndex();
-        for (int index = 0; index < chapters.size(); index++) chapters.get(index).active = chapterPage * 5 + index != chapter;
+        // Every lesson stays selectable; the current one is marked rather than greyed out.
+        for (int index = 0; index < chapters.size(); index++) {
+            int scene = chapterPage * 5 + index;
+            Component title = lesson.scenes().get(scene).title();
+            chapters.get(index).setMessage(scene == chapter ? Component.literal("\u25B6 ").append(title) : title);
+        }
         previous.active = chapter > 0 || playback.elapsedSeconds() > 1;
         next.active = chapter < lesson.scenes().size() - 1;
         play.setPlaying(!playback.paused());
