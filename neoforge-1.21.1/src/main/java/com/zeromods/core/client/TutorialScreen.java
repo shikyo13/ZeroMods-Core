@@ -55,7 +55,6 @@ public final class TutorialScreen extends FittedScreen {
             int chapter = index;
             Button button = Button.builder(lesson.scenes().get(index).title(), ignored -> playback.setScene(chapter))
                     .bounds(left + 12 + (index % 5) * (chapterWidth + 2), chapterTop, chapterWidth, 20).build();
-            button.setTooltip(Tooltip.create(lesson.scenes().get(index).title()));
             chapters.add(addRenderableWidget(button));
         }
         sceneTop = chapterTop + 25;
