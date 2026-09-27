@@ -46,7 +46,13 @@ Use `CanvasFit`/`FittedScreen` for one coordinate transform across rendering, ho
 
 `FilterRegistry<T>` lets a mod register additional categories using namespaced IDs, labels, help and predicates. `FilterRule<T>` combines category matches with OR, constraints with AND, then applies inversion. Eligibility/exemptions remain outside inversion.
 
-`EntitySelection` is the common Minecraft entity-filter contract. `MinecraftEntitySubject` handles real registry IDs, registry tags, UUIDs, scoreboard labels, living age and standard categories. Arbitrary future categories belong in the registry rather than enlarging a fixed bit mask.
+`EntitySelection` is the common Minecraft entity-filter contract. `MinecraftEntitySubject` handles real registry IDs, registry tags, UUIDs, scoreboard labels, living age and the standard categories in `EntityCategories`: hostile, passive, player, dropped item, projectile and other nonliving entities. Each entity reports exactly one. Mod-specific categories belong in the registry rather than enlarging this bit mask.
+
+Selections saved before the projectile bit existed counted projectiles as nonliving. Read them with `EntityCategories.fromLegacy` and store a version marker with new saves, so old rules keep matching the same entities.
+
+`TargetExceptions` adds named exceptions to a category selection. An excluded target never matches, an included target always matches, and everything else follows the selection; spectators and an exempt owner match neither list. `FilterTarget` defines the standard kinds (entity type or tag, item or tag, player, individual entity). A mod adds its own kinds by using its own kind strings and wrapping `TargetMatcher.STANDARD`. `FilterTargetTags` stores targets as `{Kind, Id, Name}` NBT.
+
+`LegacyLists` rewrites the older list modes (listed only, all but listed) and an inverted selection as categories plus exceptions with the same results. Check `fits` before folding so no entry is dropped.
 
 Use separate `DirectionalRules` instances for separate purposes (blocking vs sensing). The direction key must describe movement consistently on both endpoints. Missing keys inherit the common rule; don't automatically convert missing keys into empty filters.
 

@@ -9,7 +9,7 @@ Core owns reusable behavior. Mods supply their blocks, textures, sounds, tutoria
 | Package | Responsibility |
 | --- | --- |
 | `network` | One `ManagedNetwork<N>` model for identity, ownership, members, nodes, historical anchor and extension properties; directory, traversal, assigned/physical connection policies, merge/split reconciliation |
-| `filter` | Category registry, predicate composition, entity selection, optional per-direction rules with shared fallback |
+| `filter` | Category registry, predicate composition, entity selection with standard categories, allow/deny exceptions with extensible target kinds, legacy list folding, optional per-direction rules with shared fallback |
 | `settings` / `sync` | Typed setting definitions, labels/tooltips, validation, permission-checked immediate updates, strict revisions and atomic per-property edits |
 | `energy` | Simulated storage, proportional allocation and fair delivery with integer conservation |
 | `ui` | Configurable ARGB themes and matching drawing/pointer transforms |
